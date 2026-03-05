@@ -26,14 +26,22 @@ app.use(express.json());
 
 // CORS
 const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(',')
-  : ['*'];
+  ? process.env.FRONTEND_URL.split(',').map(s => s.trim())
+  : [];
 
 app.use(
   cors({
-    origin: config.nodeEnv === 'production'
-      ? allowedOrigins
-      : '*',
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, Postman, health checks)
+      if (!origin) return callback(null, true);
+      // In development, allow all
+      if (config.nodeEnv !== 'production') return callback(null, true);
+      // In production, allow listed origins or all if none configured
+      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   })
 );
