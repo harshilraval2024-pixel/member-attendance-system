@@ -13,7 +13,11 @@ const statsRoutes = require('./routes/statsRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 // Connect to database
-connectDB();
+connectDB().then(() => {
+  console.log('Database initialization complete');
+}).catch(err => {
+  console.error('Database initialization error:', err.message);
+});
 
 const app = express();
 
@@ -49,8 +53,17 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/auth', authRoutes);
 
 // Health check
+const mongoose = require('mongoose');
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ success: true, message: 'API is running' });
+  const dbState = mongoose.connection.readyState;
+  const dbStatus = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+  res.status(200).json({
+    success: true,
+    message: 'API is running',
+    database: dbStatus[dbState] || 'unknown',
+    mongoURI_set: !!process.env.MONGODB_URI,
+    env: process.env.NODE_ENV || 'not set',
+  });
 });
 
 // Error handler
