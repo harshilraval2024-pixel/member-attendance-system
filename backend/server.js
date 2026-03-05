@@ -21,30 +21,24 @@ connectDB().then(() => {
 
 const app = express();
 
+// CORS - must be before all other middleware
+app.use(cors({
+  origin: true,  // reflect the request origin — works with credentials
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Handle preflight across all routes
+app.options('*', cors({
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 // Body parser
 app.use(express.json());
-
-// CORS
-const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(',').map(s => s.trim())
-  : [];
-
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (mobile apps, curl, Postman, health checks)
-      if (!origin) return callback(null, true);
-      // In development, allow all
-      if (config.nodeEnv !== 'production') return callback(null, true);
-      // In production, allow listed origins or all if none configured
-      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true,
-  })
-);
 
 // Dev logging
 if (config.nodeEnv === 'development') {
