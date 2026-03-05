@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -9,6 +9,7 @@ import {
   faChartBar,
   faSignOutAlt,
   faBars,
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import { observer } from 'mobx-react-lite';
 import { authStore } from '../../stores';
@@ -16,16 +17,35 @@ import { authStore } from '../../stores';
 const Navbar = observer(() => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const navRef = useRef(null);
 
   const handleLogout = () => {
     authStore.logout();
     navigate('/login');
+    setIsOpen(false);
   };
 
   const isActive = (path) => location.pathname === path;
 
+  // Close menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isOpen && navRef.current && !navRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-custom sticky-top">
+    <nav className="navbar navbar-expand-lg navbar-custom sticky-top" ref={navRef}>
       <div className="container-fluid">
         <Link className="navbar-brand d-flex align-items-center" to="/">
           <span className="brand-icon">
@@ -37,13 +57,14 @@ const Navbar = observer(() => {
         <button
           className="navbar-toggler border-0"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
+          aria-label="Toggle navigation"
         >
-          <FontAwesomeIcon icon={faBars} className="text-white" />
+          <FontAwesomeIcon icon={isOpen ? faTimes : faBars} className="text-white" />
         </button>
 
-        <div className="collapse navbar-collapse" id="navbarNav">
+        <div className={`navbar-collapse ${isOpen ? 'show' : 'collapse'}`} id="navbarNav">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
               <Link className={`nav-link ${isActive('/') ? 'active' : ''}`} to="/">
@@ -72,7 +93,7 @@ const Navbar = observer(() => {
           </ul>
 
           {authStore.isAuthenticated && (
-            <div className="d-flex align-items-center gap-3">
+            <div className="navbar-actions">
               <span className="admin-badge">
                 {authStore.admin?.username || 'Admin'}
               </span>
