@@ -57,11 +57,17 @@ const mongoose = require('mongoose');
 app.get('/api/health', (req, res) => {
   const dbState = mongoose.connection.readyState;
   const dbStatus = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+  // Show env var names that contain MONGO or DB (redacted values for security)
+  const envKeys = Object.keys(process.env).filter(k => /mongo|db|uri|database/i.test(k));
   res.status(200).json({
     success: true,
     message: 'API is running',
     database: dbStatus[dbState] || 'unknown',
     mongoURI_set: !!process.env.MONGODB_URI,
+    mongoURI_length: process.env.MONGODB_URI ? process.env.MONGODB_URI.length : 0,
+    configMongoURI_length: require('./config/config').mongoURI ? require('./config/config').mongoURI.length : 0,
+    relevantEnvKeys: envKeys,
+    allEnvKeyCount: Object.keys(process.env).length,
     env: process.env.NODE_ENV || 'not set',
   });
 });
