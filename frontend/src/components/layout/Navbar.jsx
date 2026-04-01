@@ -7,6 +7,7 @@ import {
   faUserPlus,
   faClipboardCheck,
   faChartBar,
+  faQuestionCircle,
   faSignOutAlt,
   faBars,
   faTimes,
@@ -88,6 +89,12 @@ const Navbar = observer(() => {
               <Link className={`nav-link ${isActive('/attendance') ? 'active' : ''}`} to="/attendance">
                 <FontAwesomeIcon icon={faClipboardCheck} className="me-1" />
                 Attendance
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className={`nav-link ${isActive('/qa') ? 'active' : ''}`} to="/qa">
+                <FontAwesomeIcon icon={faQuestionCircle} className="me-1" />
+                Q&amp;A
               </Link>
             </li>
           </ul>
