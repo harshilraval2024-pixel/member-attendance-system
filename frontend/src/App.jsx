@@ -12,6 +12,7 @@ import MemberCreatePage from './pages/MemberCreatePage';
 import MemberEditPage from './pages/MemberEditPage';
 import MemberProfilePage from './pages/MemberProfilePage';
 import AttendancePage from './pages/AttendancePage';
+import QAPage from './pages/QAPage';
 import LoginPage from './pages/LoginPage';
 
 // FontAwesome library setup
@@ -89,6 +90,14 @@ const App = observer(() => {
           element={
             <ProtectedRoute>
               <Layout><AttendancePage /></Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/qa"
+          element={
+            <ProtectedRoute>
+              <Layout><QAPage /></Layout>
             </ProtectedRoute>
           }
         />

@@ -11,6 +11,7 @@ const memberRoutes = require('./routes/memberRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const authRoutes = require('./routes/authRoutes');
+const qaRoutes = require('./routes/qaRoutes');
 
 // Connect to database
 connectDB().then(() => {
@@ -53,6 +54,7 @@ app.use('/api/members', memberRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/qa', qaRoutes);
 
 // Health check
 const mongoose = require('mongoose');
